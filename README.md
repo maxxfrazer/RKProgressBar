@@ -32,5 +32,5 @@ func addProgressBar(to anchor: AnchorEntity) {
 
 To then animate that bar down to a value of 0 with a duration of 3 seconds:
 ```
-  pb.moveProgress(to: 0.0, duration: 10)
+  pb.moveProgress(to: 0.0, duration: 3)
 ```
