@@ -11,7 +11,7 @@ import RealityKit
 import Combine
 
 /// A capsule shaped geometry for showing progress in RealityKit 􀘸
-public class RKProgressBar: Entity {
+public class RKProgressBar: Entity, HasCollision {
   private let innerModel = ModelEntity()
   private let outerModel = ModelEntity()
   internal var innerMargin: Float = 0.25
@@ -19,6 +19,19 @@ public class RKProgressBar: Entity {
   /// Get the current progress of the RKProgressBar
   public var progress: Float {
     innerModel.transform.scale.x
+  }
+
+  public var collisionEnabled: Bool {
+    get { self.collision != nil }
+    set {
+      if newValue {
+        self.collision = CollisionComponent(shapes: [
+          .generateBox(size: [10, 1, 1])
+        ])
+      } else {
+        self.collision = nil
+      }
+    }
   }
 
   /// Create a capsule shaped progress bar entity 􀘸
@@ -31,7 +44,8 @@ public class RKProgressBar: Entity {
     innerColor: SimpleMaterial.Color = .green,
     outerColor: SimpleMaterial.Color = .black,
     innerMargin: Float = 0.25,
-    startAt: Float = 1
+    startAt: Float = 1,
+    collisionEnabled: Bool = false
   ) {
     self.innerMargin = innerMargin
     super.init()
@@ -54,6 +68,7 @@ public class RKProgressBar: Entity {
     self.addChild(outerModel)
     self.addChild(innerModel)
     self.setProgress(to: startAt)
+    self.collisionEnabled = collisionEnabled
   }
 
   /// Set the progress value for the RKProgressBar, no animation.
@@ -98,6 +113,12 @@ public class RKProgressBar: Entity {
           self.innerModel.isEnabled = false
       })
     }
+  }
+
+  func handleHitTest(hitPosition: SIMD3<Float>) {
+    let hitAt = self.convert(position: hitPosition, from: nil)
+    print(hitAt)
+    self.setProgress(to: min(max(0, hitAt.x / 10 + 0.5), 1))
   }
 
   required init() {
